@@ -211,6 +211,30 @@ class Repository
         print_r($commits);
     }
 
+    public function getStatus()
+    {
+        $output = $this->executeOSCommand("status --porcelain", $exitStatus);
+        if ($exitStatus != 0) {
+            throw new GitException($output, GitException::STATUS);
+        }
+        $context = $this;
+        $files   = array_map(
+            function ($fileName) use ($context) {
+                $parts = explode(" ", trim(str_replace("  ", " ", $fileName)));
+                if (count($parts) == 2) {
+                    $file         = new \stdClass();
+                    $file->path   = $parts[1];
+                    $file->status = $context->getFileStatus($parts[0]);
+                    return $file;
+
+                }
+            },
+            explode("\n", trim($output))
+        );
+        return $files;
+
+    }
+
     /**
      * check if git is installed
      * @throws Exceptions\GitException
@@ -254,6 +278,71 @@ class Repository
         }
 
         return $output;
+    }
+
+    public function getFileStatus($code)
+    {
+        $status        = new \stdClass();
+        $status->index = 0;
+        $status->tree  = 0;
+        switch ($code[0]) {
+            case ' ':
+                $status->index = "not updated";
+                break;
+            case 'M':
+                $status->index = "modified";
+                break;
+            case 'A':
+                $status->index = "added";
+                break;
+            case 'D':
+                $status->index = "deleted";
+                break;
+            case 'R':
+                $status->index = "renamed";
+                break;
+            case 'C':
+                $status->index = "copied";
+                break;
+            case 'U':
+                $status->index = "updated but unmerged";
+                break;
+            case '?':
+                $status->index = 'untracked';
+                break;
+        }
+        if(count($code)==2){
+            switch ($code[0]) {
+                case ' ':
+                    $status->tree = "not updated";
+                    break;
+                case 'M':
+                    $status->tree = "modified";
+                    break;
+                case 'A':
+                    $status->tree = "added";
+                    break;
+                case 'D':
+                    $status->tree = "deleted";
+                    break;
+                case 'R':
+                    $status->tree = "renamed";
+                    break;
+                case 'C':
+                    $status->tree = "copied";
+                    break;
+                case 'U':
+                    $status->tree = "updated but unmerged";
+                    break;
+                case '?':
+                    $status->tree = 'untracked';
+                    break;
+            }
+        }else{
+            $status->tree = 'unmodified';
+        }
+        $status->raw = $code;
+        return $status;
     }
 
     /**

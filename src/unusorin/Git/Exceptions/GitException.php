@@ -19,6 +19,7 @@ class GitException extends \Exception
     const TAG_LISt               = 6;
     const FETCH                  = 7;
     const PULL                   = 8;
-    const PUSH                   = 10;
+    const PUSH                   = 9;
+    const STATUS                 = 10;
 
 }
