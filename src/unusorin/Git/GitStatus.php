@@ -5,6 +5,10 @@
  */
 namespace unusorin\Git;
 
+/**
+ * Class GitStatus
+ * @package unusorin\Git
+ */
 class GitStatus
 {
     const UNKNOWN = 0;

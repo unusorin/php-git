@@ -5,6 +5,10 @@
  */
 namespace unusorin\Git\Exceptions;
 
+/**
+ * Class GitException
+ * @package unusorin\Git\Exceptions
+ */
 class GitException extends \Exception
 {
     const INSTALLATION_NOT_FOUND = 1;

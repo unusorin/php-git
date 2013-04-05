@@ -7,12 +7,25 @@ namespace unusorin\Git;
 
 use unusorin\Git\Exceptions\GitException;
 
+/**
+ * Class Repository
+ * @package unusorin\Git
+ */
 class Repository
 {
+    /**
+     * local path for the repository
+     * @var string
+     */
     protected $localPath;
+    /**
+     * git executable path
+     * @var string
+     */
     protected $gitPath = '/usr/bin/git';
 
     /**
+     * class constructor
      * @param $localPath
      * @throws \InvalidArgumentException
      */
@@ -29,6 +42,10 @@ class Repository
         $this->localPath = $localPath;
     }
 
+    /**
+     * check if local repo is inited
+     * @return bool
+     */
     public function isInited()
     {
         $this->executeOSCommand('status', $exitStatus);
@@ -39,6 +56,10 @@ class Repository
         }
     }
 
+    /**
+     * init local repo
+     * @throws Exceptions\GitException
+     */
     public function init()
     {
         if (!is_dir($this->localPath)) {
@@ -52,6 +73,10 @@ class Repository
         }
     }
 
+    /**
+     * fetch
+     * @throws Exceptions\GitException
+     */
     public function fetch()
     {
         $output = $this->executeOSCommand('fetch', $exitStatus);
@@ -61,6 +86,11 @@ class Repository
         echo $output;
     }
 
+    /**
+     * pull
+     * @return int
+     * @throws Exceptions\GitException
+     */
     public function pull()
     {
         $output = $this->executeOSCommand('pull', $exitStatus);
@@ -74,6 +104,10 @@ class Repository
         }
     }
 
+    /**
+     * push
+     * @throws Exceptions\GitException
+     */
     public function push()
     {
         $output = $this->executeOSCommand('pull', $exitStatus);
@@ -82,6 +116,11 @@ class Repository
         }
     }
 
+    /**
+     * get all remotes
+     * @return array
+     * @throws Exceptions\GitException
+     */
     public function getAllRemotes()
     {
         $output = $this->executeOSCommand('remote -v', $exitStatus);
@@ -111,6 +150,11 @@ class Repository
         return $remotes;
     }
 
+    /**
+     * get all branches
+     * @return array
+     * @throws Exceptions\GitException
+     */
     public function getAllBranches()
     {
         $output = $this->executeOSCommand('branch --no-color -a', $exitStatus);
@@ -139,6 +183,10 @@ class Repository
         return $branches;
     }
 
+    /**
+     * get all commits
+     * @throws Exceptions\GitException
+     */
     public function getAllCommits()
     {
         $output = $this->executeOSCommand("log --pretty=format:\"" . $this->getLogOutputFormat() . "\"", $exitStatus);
@@ -163,6 +211,10 @@ class Repository
         print_r($commits);
     }
 
+    /**
+     * check if git is installed
+     * @throws Exceptions\GitException
+     */
     protected function checkGitInstallation()
     {
         $response = shell_exec('which ' . $this->gitPath);
@@ -171,6 +223,12 @@ class Repository
         }
     }
 
+    /**
+     * execute git command into the os
+     * @param $command
+     * @param $exitStatus
+     * @return string
+     */
     protected function executeOSCommand($command, &$exitStatus)
     {
         $command = $this->gitPath . ' ' . $command;
@@ -198,6 +256,10 @@ class Repository
         return $output;
     }
 
+    /**
+     * git log output format
+     * @return string
+     */
     protected function getLogOutputFormat()
     {
         return '{
